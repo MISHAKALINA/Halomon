@@ -62,7 +62,6 @@ class Character:
         return Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
 
-    pygame.display.update()
 white = (255, 255, 255)
 game_width = 500
 game_height = 500
