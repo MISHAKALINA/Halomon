@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Characters>
+    <character name = "odst">
+	    <hp>45</hp>
+		<attack>49</attack>
+		<defense>49</defense>
+		<speed>45</speed>
+		<sp_attack>65</sp_attack>
+		<sp_defense>65</sp_defense>
+		<shield>0</shield>
+	</character>
+	<character name = "spartan">
+	    <hp>78</hp>
+		<attack>130</attack>
+		<defense>111</defense>
+		<speed>100</speed>
+		<sp_attack>130</sp_attack>
+		<sp_defense>85</sp_defense>
+		<shield>8</shield>
+	</character>
+	<character name = "grunt">
+	    <hp>45</hp>
+		<attack>30</attack>
+		<defense>35</defense>
+		<speed>45</speed>
+		<sp_attack>20</sp_attack>
+		<sp_defense>20</sp_defense>
+		<shield>0</shield>
+	</character>
+	<character name = "sangheili minor">
+	    <hp>39</hp>
+		<attack>52</attack>
+		<defense>43</defense>
+		<speed>65</speed>
+		<sp_attack>60</sp_attack>
+		<sp_defense>50</sp_defense>
+		<shield>10</shield>
+	</character>
+	<character name = "sangheili major">
+	    <hp>58</hp>
+		<attack>64</attack>
+		<defense>58</defense>
+		<speed>80</speed>
+		<sp_attack>80</sp_attack>
+		<sp_defense>65</sp_defense>
+		<shield>17</shield>
+	</character>
+	<character name = "sangheili general">
+	    <hp>78</hp>
+		<attack>84</attack>
+		<defense>78</defense>
+		<speed>100</speed>
+		<sp_attack>109</sp_attack>
+		<sp_defense>85</sp_defense>
+		<shield>25</shield>
+	</character>
+</Characters>
