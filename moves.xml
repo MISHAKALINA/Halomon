@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Moves>
+    <move name = "magnum">
+	    <type>uncs</type>
+		<category>physical</category>
+		<power>100</power>
+		<accuracy>100</accuracy>
+		<pp>15</pp>
+	</move>
+	<move name = "shotgun">
+	    <type>uncs</type>
+		<category>physical</category>
+		<power>100</power>
+		<accuracy>60</accuracy>
+		<pp>15</pp>
+	</move>
+	<move name = "assault rifle">
+	    <type>uncs</type>
+		<category>physical</category>
+		<power>40</power>
+		<accuracy>100</accuracy>
+		<pp>64</pp>
+	</move>
+	<move name = "spnkr">
+	    <type>uncs</type>
+		<category>explosive</category>
+		<power>100</power>
+		<accuracy>50</accuracy>
+		<pp>4</pp>
+	</move>
+	<move name = "frag grenade">
+	    <type>uncs</type>
+		<category>explosive</category>
+		<power>70</power>
+		<accuracy>70</accuracy>
+		<pp>2</pp>
+	</move>
+	<move name = "sniper rifle">
+	    <type>uncs</type>
+		<category>physical</category>
+		<power>70</power>
+		<accuracy>100</accuracy>
+		<pp>16</pp>
+	</move>
+	<move name = "energy rifle">
+	    <type>covenant</type>
+		<category>energy</category>
+		<power>60</power>
+		<accuracy>100</accuracy>
+		<pp>30</pp>
+	</move>
+	<move name = "energy pistol">
+	    <type>covenant</type>
+		<category>energy</category>
+		<power>45</power>
+		<accuracy>100</accuracy>
+		<pp>30</pp>
+	</move>
+	<move name = "needler">
+	    <type>covenant</type>
+		<category>energy</category>
+		<power>49</power>
+		<accuracy>45</accuracy>
+		<pp>65</pp>
+	</move>
+	<move name = "energy grenade">
+	    <type>covenant</type>
+		<category>explosive</category>
+		<power>100</power>
+		<accuracy>30</accuracy>
+		<pp>2</pp>
+	</move>
+	<move name = "energy sword">
+	    <type>covenant</type>
+		<category>energy</category>
+		<power>100</power>
+		<accuracy>50</accuracy>
+		<pp>4</pp>
+	</move>
+</Moves>
