@@ -7,7 +7,7 @@ from lxml import etree
 import os
 
 pygame.init()
-
+#создание списка всех видов движений
 all_moves = []
 file = os.getcwd() + "\\moves.xml"
 moves = etree.parse(file)
@@ -15,7 +15,7 @@ moves = etree.tostring(moves)
 moves = etree.fromstring(moves)
 for move in moves:
     all_moves.append(move.get("name"))
-
+#создание списка всех имён
 all_names = []
 file = os.getcwd() + "\\stats.xml"
 names = etree.parse(file)
@@ -23,7 +23,7 @@ names = etree.tostring(names)
 names = etree.fromstring(names)
 for name in names:
     all_names.append(name.get("name"))
-
+#создание шаблонов для цвета
 black = (0, 0, 0)
 gold = (218, 165, 32)
 grey = (200, 200, 200)
@@ -31,7 +31,7 @@ green = (0, 200, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
 
-
+#класс для движений
 class Move:
 
     def __init__(self, name):
@@ -55,7 +55,7 @@ class Move:
                         self.pp = int(stat.text)
                 break
 
-
+#класс персонажа(игрового и npc)
 class Character(pygame.sprite.Sprite):
 
     def __init__(self, name, level, x, y, moves=random.sample(all_moves, 4)):
@@ -97,29 +97,30 @@ class Character(pygame.sprite.Sprite):
                         self.base_speed = int(stat.text)
                     elif stat.tag == "shield":
                         self.max_shield = int(stat.text)
-                break
+                break #выше получение базовых статов персонажей и дальнейшая их обработка
 
         self.max_shield = int(self.max_hp * (self.max_shield / 100))
         self.current_shield = self.max_shield
         self.size = 250
-        self.file_image = os.getcwd() + "\\characters\\" + self.name + ".png"
+        self.file_image = os.getcwd() + "\\characters\\" + self.name + ".png" #спрайт
         self.image = pygame.image.load(self.file_image).convert_alpha()
         self.hp_x = 0
         self.hp_y = 0
         self.flag_shield = 1
 
     def change_image(self):
-        self.image = pygame.image.load(self.file_image).convert_alpha()
-    def flip(self):
-        self.image = pygame.transform.flip(self.image, True, False)
+        self.image = pygame.image.load(self.file_image).convert_alpha() #изменение для "эволюции"
 
-    def set_sprite(self):
+    def flip(self):
+        self.image = pygame.transform.flip(self.image, True, False) #изменение ориентации спрайта
+
+    def set_sprite(self): #приведение спрайта к нудному размеру
         scale = self.size / self.image.get_width()
         new_width = self.image.get_width() * scale
         new_height = self.image.get_height() * scale
         self.image = pygame.transform.scale(self.image, (new_width, new_height))
 
-    def draw(self, alpha=255):
+    def draw(self, alpha=255): #вывод спрайта
         sprite = self.image.copy()
         transparency = (255, 255, 255, alpha)
         sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
@@ -128,7 +129,7 @@ class Character(pygame.sprite.Sprite):
     def get_rect(self):
         return Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def draw_hp(self):
+    def draw_hp(self): #вывод здоровья и щита и доп информации
         bar_scale = 75 // self.max_hp
         pygame.draw.rect(game, white, (self.hp_x, self.hp_y, 150, 40))
         pygame.draw.rect(game, black, (self.hp_x, self.hp_y, 150, 40), 2)
@@ -170,15 +171,15 @@ class Character(pygame.sprite.Sprite):
             for i in range(self.current_shield):
                 bar = (self.hp_x + 70 + bar_scale * i, self.hp_y + 20, bar_scale, 3)
                 pygame.draw.rect(game, green, bar)
-            pygame.draw.rect(game, 	(128, 166, 255), (self.hp_x + 70, self.hp_y + 20, bar_scale * self.max_shield, 3), 1)
+            pygame.draw.rect(game, (128, 166, 255), (self.hp_x + 70, self.hp_y + 20, bar_scale * self.max_shield, 3), 1)
 
-    def use_medkit(self):
+    def use_medkit(self): #функция лечения
         self.current_hp += 30
         if self.current_hp > self.max_hp:
             self.current_hp = self.max_hp
         self.medkit -= 1
 
-    def take_damage(self, damage):
+    def take_damage(self, damage): #урон
 
         if self.current_shield > 0:
             self.current_shield -= damage
@@ -191,7 +192,7 @@ class Character(pygame.sprite.Sprite):
             if self.current_hp < 0:
                 self.current_hp = 0
 
-    def perform_attack(self, other, move):
+    def perform_attack(self, other, move): #выполнение движения
 
         display_message(f'{self.name} used {move.name}')
         time.sleep(2)
@@ -199,10 +200,10 @@ class Character(pygame.sprite.Sprite):
 
         if move.type == "explosive":
             damage *= 1.5
-        if move.type == "energy" and other.current_shield>0:
-            damage*=1,5
+        if move.type == "energy" and other.current_shield > 0:
+            damage *= 1, 5
         elif move.type == "physical" and other.current_shield == 0:
-            damage*=1.5
+            damage *= 1.5
 
         random_num = random.randint(1, 10000)
         if random_num <= 625:
@@ -211,11 +212,10 @@ class Character(pygame.sprite.Sprite):
         other.take_damage(damage)
 
 
-def display_message(message):
+def display_message(message): #вывод сообщения и рамки к нему
     pygame.draw.rect(game, white, (0, 370, 500, 130))
     pygame.draw.rect(game, (0, 0, 0, 0), (0, 370, 500, 130), 3)
 
-    # display the message
     font = pygame.font.Font(pygame.font.get_default_font(), 20)
     text = font.render(message, True, (0, 0, 0, 0))
     text_rect = text.get_rect()
@@ -226,7 +226,7 @@ def display_message(message):
     pygame.display.update()
 
 
-def create_button(width, height, left, top, text_cx, text_cy, label):
+def create_button(width, height, left, top, text_cx, text_cy, label): #создание кнопки
     # position of the mouse cursor
     mouse_cursor = pygame.mouse.get_pos()
 
@@ -251,47 +251,47 @@ size = (game_width, game_height)
 game = pygame.display.set_mode(size)
 pygame.display.set_caption('Battle')
 bg_imges = {}
-for i in os.listdir(os.getcwd() + "\\backgrounds"):
+for i in os.listdir(os.getcwd() + "\\backgrounds"): #преобразование всх задников
     bg_img = pygame.image.load(os.getcwd() + "\\backgrounds\\" + i)
     bg_img = pygame.transform.scale(bg_img, (game_width, game_height))
     bg_imges[i[:i.find(".")]] = bg_img
 
 character = Character("odst", 1, 0, 100, ["assault rifle", "frag grenade", "shotgun", "magnum"])
-character.set_sprite()
+character.set_sprite() #создание персонажа и приведение в нужный размер спрайта
 
 character1 = Character("sangheili minor", 1, 250, 100, ["energy sword", "energy grenade", "needler", "energy rifle"])
 character1.set_sprite()
 character1.flip()
 opponent = Character(random.sample(all_names, 1)[0], 1, 250, 120)
 opponent.set_sprite()
-opponent.flip()
+opponent.flip() #создание оппонента
 opponent.moves.append(1)
 
 characters_list = [character, character1]
-flag = 0
+flag = 0 #флаг поражения
 game_status = "start_menu"
 pygame.mixer.music.load(os.getcwd() + "\\music\\" + game_status + ".mp3")
-pygame.mixer.music.play(-1)
+pygame.mixer.music.play(-1) #запуск музыки
 while game_status != 'quit':
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == QUIT: #обработка событий
             game_status = 'quit'
         if event.type == KEYDOWN and game_status == '?':
 
-            if event.key == K_y:
+            if event.key == K_y: #продолжение игры
 
-                opponent = Character(random.sample(all_names, 1)[0],player.level, 250, 120)
+                opponent = Character(random.sample(all_names, 1)[0], player.level, 250, 120)
                 opponent.set_sprite()
                 opponent.flip()
                 opponent.moves.append(1)
                 game_status = "pre battle"
 
-            elif event.key == K_n:
+            elif event.key == K_n: #выход из игры
                 game_status = 'quit'
 
-        if event.type == MOUSEBUTTONDOWN:
+        if event.type == MOUSEBUTTONDOWN: #обработка мыши
             mouse_click = event.pos
-            if game_status == 'select':
+            if game_status == 'select': #выбор бойца
                 for i in range(len(characters_list)):
                     if characters_list[i].get_rect().collidepoint(mouse_click):
                         if i == 1:
@@ -303,7 +303,7 @@ while game_status != 'quit':
                         pygame.mixer.music.load(os.getcwd() + "\\music\\" + game_status + ".mp3")
                         pygame.mixer.music.play(-1)
 
-            elif game_status == 'player turn':
+            elif game_status == 'player turn': #выбор действие или медицина
 
                 if fight_button.collidepoint(mouse_click):
                     game_status = 'player move'
@@ -317,17 +317,16 @@ while game_status != 'quit':
                     else:
                         player.use_medkit()
                         display_message(f'{player.name} used medkit')
-                        if opponent.flag_shield == 0:
+                        if opponent.flag_shield == 0: #восстановление щита противника
                             opponent.current_shield = opponent.max_shield
                         time.sleep(2)
                         game_status = 'opponent turn'
-            elif game_status == "start_menu":
+
+            elif game_status == "start_menu": #обработка кнопки в меню
                 if start_button.collidepoint(mouse_click):
                     game_status = 'select'
 
-
-            elif game_status == 'player move':
-
+            elif game_status == 'player move': #выбор действия
                 for i in range(len(move_buttons)):
                     button = move_buttons[i]
 
@@ -339,7 +338,7 @@ while game_status != 'quit':
                         else:
                             game_status = 'opponent turn'
 
-    if game_status == 'select':
+    if game_status == 'select': #окно выбора
         game.blit(bg_imges[game_status], (0, 0))
         character.draw()
         character1.draw()
@@ -474,7 +473,7 @@ while game_status != 'quit':
         if game_status == 'battleover':
             flag_stop = 0
             flag_ev = 0
-            player.level +=1
+            player.level += 1
             if player.level == 6:
                 if player.name == "spartan":
                     game_status = "cortana"
@@ -524,9 +523,10 @@ while game_status != 'quit':
             player.attack = math.floor(0.01 * (2 * player.base_attack + player.IV_attack * player.level) + 5)
             player.defense = math.floor(0.01 * (2 * player.base_defense + player.IV_defense * player.level) + 5)
             player.speed = math.floor(0.01 * (2 * player.base_speed + player.IV_speed * player.level) + 5)
-            player.max_hp = math.floor(((2 * int(player.base_hp) + player.IV_hp * player.level) / 100) + player.level + 10)
+            player.max_hp = math.floor(
+                ((2 * int(player.base_hp) + player.IV_hp * player.level) / 100) + player.level + 10)
             player.current_hp = player.max_hp
-            player.max_shield = 2+player.max_shield
+            player.max_shield = 2 + player.max_shield
             player.current_shield = player.max_shield
             player.medkit = 3
             player.flag_shield = 1
