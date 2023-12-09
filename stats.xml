@@ -8,6 +8,9 @@
 		<sp_attack>65</sp_attack>
 		<sp_defense>65</sp_defense>
 		<shield>0</shield>
+		<evolution>spartan</evolution>
+		<ev_lvl>4</ev_lvl>
+		<type>uncs</type>
 	</character>
 	<character name = "spartan">
 	    <hp>78</hp>
@@ -17,6 +20,9 @@
 		<sp_attack>130</sp_attack>
 		<sp_defense>85</sp_defense>
 		<shield>8</shield>
+		<evolution>no</evolution>
+		<ev_lvl>-1</ev_lvl>
+		<type>uncs</type>
 	</character>
 	<character name = "grunt">
 	    <hp>45</hp>
@@ -26,6 +32,9 @@
 		<sp_attack>20</sp_attack>
 		<sp_defense>20</sp_defense>
 		<shield>0</shield>
+		<evolution>no</evolution>
+		<ev_lvl>-1</ev_lvl>
+		<type>covenant</type>
 	</character>
 	<character name = "sangheili minor">
 	    <hp>39</hp>
@@ -35,6 +44,9 @@
 		<sp_attack>60</sp_attack>
 		<sp_defense>50</sp_defense>
 		<shield>10</shield>
+		<evolution>sangheili major</evolution>
+		<ev_lvl>2</ev_lvl>
+		<type>covenant</type>
 	</character>
 	<character name = "sangheili major">
 	    <hp>58</hp>
@@ -44,6 +56,9 @@
 		<sp_attack>80</sp_attack>
 		<sp_defense>65</sp_defense>
 		<shield>17</shield>
+		<evolution>sangheili general</evolution>
+		<ev_lvl>4</ev_lvl>
+		<type>covenant</type>
 	</character>
 	<character name = "sangheili general">
 	    <hp>78</hp>
@@ -53,5 +68,8 @@
 		<sp_attack>109</sp_attack>
 		<sp_defense>85</sp_defense>
 		<shield>25</shield>
+		<evolution>no</evolution>
+		<ev_lvl>-1</ev_lvl>
+		<type>covenant</type>
 	</character>
 </Characters>

@@ -6,7 +6,7 @@ from lxml import etree
 import os
 
 pygame.init()
-#создание списка всех видов движений
+# создание списка всех видов движений
 all_moves = {}
 file = os.getcwd() + "\\moves.xml"
 moves = etree.parse(file)
@@ -26,7 +26,7 @@ for move in moves:
             pp = int(stat.text)
     all_moves[move.get("name")] = {"type": type, "category": category, "power": power, "accuracy": accuracy, "pp": pp}
 
-#создание списка всех видов персонажей
+# создание списка всех видов персонажей
 file = os.getcwd() + "\\stats.xml"
 characters = etree.parse(file)
 characters = etree.tostring(characters)
@@ -50,9 +50,12 @@ for character in characters:
             ev_lvl = int(stat.text)
         elif stat.tag == "type":
             type = stat.text
-    base_characters[character.get("name")] = {"base_hp": base_hp, "base_attack":base_attack, "base_defense":base_defense, "base_speed": base_speed, "base_shield": base_shield, "evolution": evolution, "ev_lvl": ev_lvl, "type": type}
+    base_characters[character.get("name")] = {"base_hp": base_hp, "base_attack": base_attack,
+                                              "base_defense": base_defense, "base_speed": base_speed,
+                                              "base_shield": base_shield, "evolution": evolution, "ev_lvl": ev_lvl,
+                                              "type": type}
 
-#создание шаблонов для цвета
+# создание шаблонов для цвета
 black = (0, 0, 0)
 gold = (218, 165, 32)
 grey = (200, 200, 200)
@@ -60,7 +63,8 @@ green = (0, 200, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
 
-#класс для движений
+
+# класс для движений
 class Move:
 
     def __init__(self, name):
@@ -72,7 +76,16 @@ class Move:
         self.pp = all_moves[name]["pp"]
         self.cur_pp = self.pp
 
-#класс персонажа(игрового и npc)
+class Map:
+
+    def __init__(self, music, game_status):
+        game.blit(bg_images[game_status], (0, 0))
+        pygame.display.update()
+        pygame.mixer.music.load(os.getcwd() + "\\music\\" + music + ".mp3")
+        pygame.mixer.music.play(-1)
+
+
+# класс персонажа(игрового и npc)
 
 class Character(pygame.sprite.Sprite):
 
@@ -92,7 +105,8 @@ class Character(pygame.sprite.Sprite):
         self.IV_attack = random.randint(0, 31)
         self.IV_defense = random.randint(0, 31)
         self.IV_speed = random.randint(0, 31)
-        self.max_hp = math.floor(((2 * base_characters[name]["base_hp"] + self.IV_hp * self.level) / 100) + self.level + 10)
+        self.max_hp = math.floor(
+            ((2 * base_characters[name]["base_hp"] + self.IV_hp * self.level) / 100) + self.level + 10)
         self.current_hp = self.max_hp
         self.attack = math.floor(0.01 * (2 * base_characters[name]["base_attack"] + self.IV_attack * self.level) + 5)
         self.defense = math.floor(0.01 * (2 * base_characters[name]["base_defense"] + self.IV_defense * self.level) + 5)
@@ -107,18 +121,22 @@ class Character(pygame.sprite.Sprite):
         self.hp_y = 0
         self.type = base_characters[name]["type"]
         self.flag_shield = 1
+        if self.evolution != "no":
+            self.evolution_image = ch_images[self.evolution]
 
     def flip(self):
-        self.image = pygame.transform.flip(self.image, True, False) #изменение ориентации спрайта
+        self.image = pygame.transform.flip(self.image, True, False)  # изменение ориентации спрайта
 
-    def set_sprite(self): #приведение спрайта к нудному размеру
+    def set_sprite(self):  # приведение спрайта к нудному размеру
         scale = self.size / self.image.get_width()
         new_width = self.image.get_width() * scale
         new_height = self.image.get_height() * scale
         self.image = pygame.transform.scale(self.image, (new_width, new_height))
-
-    def draw(self, alpha=255): #вывод спрайта
-        sprite = self.image.copy()
+    def draw(self, ev=0, alpha=255):  # вывод спрайта
+        if ev==0:
+            sprite = self.image.copy()
+        elif ev == 1:
+            sprite = self.evolution_image.copy()
         transparency = (255, 255, 255, alpha)
         sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
         game.blit(sprite, (self.x, self.y))
@@ -126,10 +144,10 @@ class Character(pygame.sprite.Sprite):
     def get_rect(self):
         return Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def draw_hp(self): #вывод здоровья и щита и доп информации
-        bar_scale = 75 // self.max_hp
-        pygame.draw.rect(game, white, (self.hp_x, self.hp_y, 150, 40))
-        pygame.draw.rect(game, black, (self.hp_x, self.hp_y, 150, 40), 2)
+    def draw_hp(self):  # вывод здоровья и щита и доп информации
+
+        pygame.draw.rect(game, white, (self.hp_x, self.hp_y, 150, 45))
+        pygame.draw.rect(game, black, (self.hp_x, self.hp_y, 150, 45), 2)
 
         font = pygame.font.Font(pygame.font.get_default_font(), 12)
         text = font.render(self.name, True, (0, 0, 0, 0))
@@ -149,34 +167,34 @@ class Character(pygame.sprite.Sprite):
         text = font.render(f"HP:{self.current_hp}/{self.max_hp}", True, (0, 0, 0, 0))
         text_rect = text.get_rect()
         text_rect.x = self.hp_x + 5
-        text_rect.y = self.hp_y + 25
+        text_rect.y = self.hp_y + 33
         game.blit(text, text_rect)
 
-        for i in range(self.max_hp):
-            bar = (self.hp_x + 70 + bar_scale * i, self.hp_y + 27, bar_scale, 7)
-            pygame.draw.rect(game, red, bar)
-        for i in range(self.current_hp):
-            bar = (self.hp_x + 70 + bar_scale * i, self.hp_y + 27, bar_scale, 7)
-            pygame.draw.rect(game, green, bar)
-        pygame.draw.rect(game, black, (self.hp_x + 70, self.hp_y + 27, bar_scale * self.max_hp, 7), 1)
+        bar_scale = self.current_hp / self.max_hp
+        pygame.draw.rect(game, red, (self.hp_x + 70, self.hp_y + 33, 75, 7))
+        pygame.draw.rect(game, green, (self.hp_x + 70, self.hp_y + 33, 75 * bar_scale, 7))
+        pygame.draw.rect(game, black, (self.hp_x + 70, self.hp_y + 33, 75, 7), 1)
+        if self.max_shield > 0:
 
-        if self.max_shield != 0:
-            bar_scale = 75 // self.max_shield
-            for i in range(self.max_shield):
-                bar = (self.hp_x + 70 + bar_scale * i, self.hp_y + 20, bar_scale, 5)
-                pygame.draw.rect(game, grey, bar)
-            for i in range(self.current_shield):
-                bar = (self.hp_x + 70 + bar_scale * i, self.hp_y + 20, bar_scale, 5)
-                pygame.draw.rect(game, (128, 166, 255), bar)
-            pygame.draw.rect(game, black, (self.hp_x + 70, self.hp_y + 20, bar_scale * self.max_shield, 5), 1)
+            font = pygame.font.Font(pygame.font.get_default_font(), 10)
+            text = font.render(f"Shield:{self.current_shield}/{self.max_shield}", True, (0, 0, 0, 0))
+            text_rect = text.get_rect()
+            text_rect.x = self.hp_x + 5
+            text_rect.y = self.hp_y + 21
+            game.blit(text, text_rect)
 
-    def use_medkit(self): #функция лечения
+            bar_scale = self.current_shield / self.max_shield
+            pygame.draw.rect(game, grey, (self.hp_x + 70, self.hp_y + 26, 75, 5))
+            pygame.draw.rect(game, (128, 166, 255), (self.hp_x + 70, self.hp_y + 26, 75 * bar_scale, 5))
+            pygame.draw.rect(game, black, (self.hp_x + 70, self.hp_y + 26, 75, 5), 1)
+
+    def use_medkit(self):  # функция лечения
         self.current_hp += 30
         if self.current_hp > self.max_hp:
             self.current_hp = self.max_hp
         self.medkit -= 1
 
-    def take_damage(self, damage): #урон
+    def take_damage(self, damage):  # урон
 
         if self.current_shield > 0:
             self.current_shield -= damage
@@ -189,15 +207,11 @@ class Character(pygame.sprite.Sprite):
             if self.current_hp < 0:
                 self.current_hp = 0
 
-    def perform_attack(self, other, move): #выполнение движения
-
-        display_message(f'{self.name} used {move.name}')
-        pygame.time.wait(2000)
+    def perform_attack(self, other, move):  # выполнение движения
         damage = (2 * self.level + 10) / 250 * self.attack / other.defense * move.power
-
         if move.type == "explosive":
             damage *= 1.5
-        if move.type == "energy" and other.current_shield > 0:
+        if move.type == "plasma" and other.current_shield > 0:
             damage *= 1, 5
         elif move.type == "physical" and other.current_shield == 0:
             damage *= 1.5
@@ -206,10 +220,15 @@ class Character(pygame.sprite.Sprite):
         if random_num <= 625:
             damage *= 1.5
         damage = math.floor(damage)
+        display_message(f'{self.name} used {move.name}')
+        sounds[move.name].play()
+        pygame.time.wait(2000)
+        display_message(f"{other.name} take {damage} {move.category} damage")
+        pygame.time.wait(2000)
         other.take_damage(damage)
 
 
-def display_message(message): #вывод сообщения и рамки к нему
+def display_message(message):  # вывод сообщения и рамки к нему
     pygame.draw.rect(game, white, (0, 370, 500, 130))
     pygame.draw.rect(game, (0, 0, 0, 0), (0, 370, 500, 130), 3)
 
@@ -223,7 +242,7 @@ def display_message(message): #вывод сообщения и рамки к н
     pygame.display.update()
 
 
-def create_button(width, height, left, top, text_cx, text_cy, label): #создание кнопки
+def create_button(width, height, left, top, text_cx, text_cy, label):  # создание кнопки
     # position of the mouse cursor
     mouse_cursor = pygame.mouse.get_pos()
 
@@ -245,32 +264,35 @@ def create_button(width, height, left, top, text_cx, text_cy, label): #созд�
 game_width = 500
 game_height = 500
 game = pygame.display.set_mode((game_width, game_height))
-pygame_icon = pygame.image.load(os.getcwd() + "\\icon.jpeg")
+pygame_icon = pygame.image.load(os.getcwd() + "\\icon.png")
 pygame.display.set_icon(pygame_icon)
 pygame.display.set_caption('Halomon')
 bg_images = {}
-for i in os.listdir(os.getcwd() + "\\backgrounds"): #преобразование всх задников
+for i in os.listdir(os.getcwd() + "\\backgrounds"):  # преобразование всх задников
     bg_img = pygame.image.load(os.getcwd() + "\\backgrounds\\" + i).convert_alpha()
     bg_img = pygame.transform.scale(bg_img, (game_width, game_height))
     bg_images[i[:i.find(".")]] = bg_img
 ch_images = {}
-for i in os.listdir(os.getcwd() + "\\characters"): #преобразование всх задников
+for i in os.listdir(os.getcwd() + "\\characters"):  # преобразование всх задников
     ch_img = pygame.image.load(os.getcwd() + "\\characters\\" + i).convert_alpha()
     ch_img = pygame.transform.scale(ch_img, (250, 250))
     ch_images[i[:i.find(".")]] = ch_img
+sounds = {}
+for i in os.listdir(os.getcwd() + "\\weapons sound"):  # преобразование всх задников
+    sound = pygame.mixer.Sound(os.getcwd() + "\\weapons sound\\" + i)
+    sounds[i[:i.find(".")]] = sound
 
-
-flag = 0 #флаг поражения
+flag = 0  # флаг поражения
 game_status = "start_menu"
 pygame.mixer.music.load(os.getcwd() + "\\music\\" + game_status + ".mp3")
-pygame.mixer.music.play(-1) #запуск музыки
+pygame.mixer.music.play(-1)  # запуск музыки
 while game_status != 'quit':
     for event in pygame.event.get():
-        if event.type == QUIT: #обработка событий
+        if event.type == QUIT:  # обработка событий
             game_status = 'quit'
         if event.type == KEYDOWN and game_status == '?':
 
-            if event.key == K_y: #продолжение игры
+            if event.key == K_y:  # продолжение игры
 
                 opponent = Character(random.choice(list(base_characters.keys())), player.level, 250, 120)
                 opponent.set_sprite()
@@ -278,12 +300,12 @@ while game_status != 'quit':
                 opponent.moves.append(1)
                 game_status = "pre battle"
 
-            elif event.key == K_n: #выход из игры
-                game_status = 'quit'
+            elif event.key == K_n:  # выход из игры
+                game_status = 'start_menu'
 
-        if event.type == MOUSEBUTTONDOWN: #обработка мыши
+        if event.type == MOUSEBUTTONDOWN:  # обработка мыши
             mouse_click = event.pos
-            if game_status == 'select': #выбор бойца
+            if game_status == 'select':  # выбор бойца
                 for i in range(len(characters_list)):
                     if characters_list[i].get_rect().collidepoint(mouse_click):
                         if i == 1:
@@ -295,7 +317,7 @@ while game_status != 'quit':
                         pygame.mixer.music.load(os.getcwd() + "\\music\\" + game_status + ".mp3")
                         pygame.mixer.music.play(-1)
 
-            elif game_status == 'player turn': #выбор действие или медицина
+            elif game_status == 'player turn':  # выбор действие или медицина
 
                 if fight_button.collidepoint(mouse_click):
                     game_status = 'player move'
@@ -309,31 +331,29 @@ while game_status != 'quit':
                     else:
                         player.use_medkit()
                         display_message(f'{player.name} used medkit')
-                        if opponent.flag_shield == 0: #восстановление щита противника
+                        if opponent.flag_shield == 0:  # восстановление щита противника
                             opponent.current_shield = opponent.max_shield
                         pygame.time.wait(2000)
                         game_status = 'opponent turn'
 
-            elif game_status == "start_menu": #обработка кнопки в меню
+            elif game_status == "start_menu":  # обработка кнопки в меню
                 if start_button.collidepoint(mouse_click):
                     character = Character("odst", 1, 0, 100, ["assault rifle", "frag grenade", "shotgun", "magnum"])
                     character.set_sprite()
-
                     character1 = Character("sangheili minor", 1, 250, 100,
-                                           ["energy sword", "energy grenade", "needler", "energy rifle"])
+                                           ["energy sword", "plasma grenade", "needler", "plasma rifle"])
                     character1.set_sprite()
                     character1.flip()
                     opponent = Character(random.choice(list(base_characters.keys())), 1, 250, 120)
                     opponent.set_sprite()
                     opponent.flip()
                     opponent.moves.append(1)
-                    print(opponent.moves)
                     characters_list = [character, character1]
                     game_status = 'select'
                 elif quit_button.collidepoint(mouse_click):
                     game_status = "quit"
 
-            elif game_status == 'player move': #выбор действия
+            elif game_status == 'player move':  # выбор действия
                 for i in range(len(move_buttons)):
                     button = move_buttons[i]
 
@@ -345,7 +365,7 @@ while game_status != 'quit':
                         else:
                             game_status = 'opponent turn'
 
-    if game_status == 'select': #окно выбора
+    if game_status == 'select':  # окно выбора
         game.blit(bg_images[game_status], (0, 0))
         character.draw()
         character1.draw()
@@ -357,7 +377,7 @@ while game_status != 'quit':
         pygame.display.update()
 
     if game_status == 'pre battle':
-        game.blit(bg_images[game_status], (0, 0))
+        game.blit(bg_images[game_status + str(random.randint(0, 2))], (0, 0))
         player.x, player.y = 40, 90
         opponent.x, opponent.y = 210, 0
         player.hp_x = 270
@@ -366,18 +386,16 @@ while game_status != 'quit':
         opponent.hp_y = 30
         alpha = 0
         while alpha < 255:
-            game.blit(bg_images[game_status], (0, 0))
-            opponent.draw(alpha)
+            opponent.draw(alpha=alpha)
             display_message(f'You meet {opponent.name}!')
-            alpha += 2
+            alpha += 0.5
             pygame.display.update()
         alpha = 0
         while alpha < 255:
-            game.blit(bg_images[game_status], (0, 0))
             opponent.draw()
-            player.draw(alpha)
+            player.draw(alpha=alpha)
             display_message(f"I go to kill you, {opponent.name}!")
-            alpha += 2
+            alpha += 0.5
 
             pygame.display.update()
         if player.speed >= opponent.speed:
@@ -446,11 +464,11 @@ while game_status != 'quit':
             opponent.draw_hp()
             if opponent.current_hp == 0:
                 player.draw()
-                opponent.draw(alpha)
+                opponent.draw(alpha=alpha)
                 display_message(f'{opponent.name} fainted!')
                 flag = 1
             else:
-                player.draw(alpha)
+                player.draw(alpha=alpha)
                 opponent.draw()
                 display_message(f'{player.name} fainted!')
                 flag = 0
@@ -478,25 +496,46 @@ while game_status != 'quit':
             else:
                 game_status = "?"
             if player.ev_lvl == player.level:
+                game.blit(bg_images["evolution"], (0, 0))
+                alpha = 255
+                alpha1 = 0
+                while alpha > 0:
+                    game.blit(bg_images["evolution"], (0, 0))
+                    player.draw(alpha=alpha)
+                    player.draw(ev=1, alpha=0 + alpha1)
+                    alpha -= 0.5
+                    alpha1 += 0.5
+                    display_message(f"{player.name} turning into {player.evolution}")
+                    pygame.display.update()
                 player.name = player.evolution
+                player.evolution = base_characters[player.name]["evolution"]
+                player.ev_lvl = base_characters[player.name]["ev_lvl"]
                 player.image = ch_images[player.name]
+                if player.evolution!="no":
+                    player.evolution_image = ch_images[player.evolution]
                 player.set_sprite()
-                display_message(f"{player.name} turning into {player.evolution}")
+                display_message(f"Now you are {player.name}!")
+                pygame.time.wait(3000)
 
-            player.attack = math.floor(0.01 * (2 * base_characters[player.name]["base_attack"] + player.IV_attack * player.level) + 5)
-            player.defense = math.floor(0.01 * (2 * base_characters[player.name]["base_defense"] + player.IV_defense * player.level) + 5)
-            player.speed = math.floor(0.01 * (2 * base_characters[player.name]["base_speed"] + player.IV_speed * player.level) + 5)
-            player.max_hp = math.floor(((2 * base_characters[player.name]["base_hp"] + player.IV_hp * player.level) / 100) + player.level + 10)
+            player.attack = math.floor(
+                0.01 * (2 * base_characters[player.name]["base_attack"] + player.IV_attack * player.level) + 5)
+            player.defense = math.floor(
+                0.01 * (2 * base_characters[player.name]["base_defense"] + player.IV_defense * player.level) + 5)
+            player.speed = math.floor(
+                0.01 * (2 * base_characters[player.name]["base_speed"] + player.IV_speed * player.level) + 5)
+            player.max_hp = math.floor(
+                ((2 * base_characters[player.name]["base_hp"] + player.IV_hp * player.level) / 100) + player.level + 10)
             player.current_hp = player.max_hp
             player.max_shield = player.level + int(player.max_hp * (base_characters[player.name]["base_shield"] / 100))
             player.current_shield = player.max_shield
             player.medkit = 3
             player.flag_shield = 1
-            player.draw_hp()
-            opponent.draw_hp()
-            player.draw()
-            pygame.time.wait(5000)
-            pygame.display.update()
+            if player.ev_lvl == player.level:
+                player.draw_hp()
+                opponent.draw_hp()
+                player.draw()
+                pygame.time.wait(5000)
+                pygame.display.update()
 
     if game_status == "?":
         display_message('Do you want to continue(Y/N)?')
