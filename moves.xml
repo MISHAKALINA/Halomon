@@ -3,21 +3,21 @@
     <move name = "magnum">
 	    <type>uncs</type>
 		<category>physical</category>
-		<power>100</power>
-		<accuracy>100</accuracy>
+		<power>70</power>
+		<accuracy>60</accuracy>
 		<pp>15</pp>
 	</move>
 	<move name = "shotgun">
 	    <type>uncs</type>
 		<category>physical</category>
-		<power>100</power>
+		<power>90</power>
 		<accuracy>60</accuracy>
 		<pp>15</pp>
 	</move>
 	<move name = "assault rifle">
 	    <type>uncs</type>
 		<category>physical</category>
-		<power>40</power>
+		<power>50</power>
 		<accuracy>100</accuracy>
 		<pp>64</pp>
 	</move>
@@ -30,7 +30,7 @@
 	</move>
 	<move name = "frag grenade">
 	    <type>uncs</type>
-		<category>explosive</category>
+		<category>physical explosive</category>
 		<power>70</power>
 		<accuracy>70</accuracy>
 		<pp>2</pp>
@@ -38,43 +38,43 @@
 	<move name = "sniper rifle">
 	    <type>uncs</type>
 		<category>physical</category>
-		<power>70</power>
-		<accuracy>100</accuracy>
-		<pp>16</pp>
+		<power>80</power>
+		<accuracy>50</accuracy>
+		<pp>4</pp>
 	</move>
 	<move name = "plasma rifle">
 	    <type>covenant</type>
 		<category>plasma</category>
-		<power>60</power>
-		<accuracy>100</accuracy>
-		<pp>30</pp>
+		<power>50</power>
+		<accuracy>90</accuracy>
+		<pp>15</pp>
 	</move>
 	<move name = "plasma pistol">
 	    <type>covenant</type>
 		<category>plasma</category>
 		<power>45</power>
-		<accuracy>100</accuracy>
-		<pp>30</pp>
+		<accuracy>90</accuracy>
+		<pp>15</pp>
 	</move>
 	<move name = "needler">
 	    <type>covenant</type>
 		<category>physical</category>
-		<power>49</power>
-		<accuracy>45</accuracy>
-		<pp>65</pp>
+		<power>60</power>
+		<accuracy>65</accuracy>
+		<pp>40</pp>
 	</move>
 	<move name = "plasma grenade">
 	    <type>covenant</type>
-		<category>plasma</category>
+		<category>plasma explosive</category>
 		<power>100</power>
-		<accuracy>30</accuracy>
+		<accuracy>50</accuracy>
 		<pp>2</pp>
 	</move>
 	<move name = "energy sword">
 	    <type>covenant</type>
 		<category>plasma</category>
 		<power>100</power>
-		<accuracy>50</accuracy>
+		<accuracy>70</accuracy>
 		<pp>4</pp>
 	</move>
 </Moves>

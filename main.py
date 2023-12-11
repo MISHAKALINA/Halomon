@@ -103,7 +103,7 @@ class Map:
 
 class Character(pygame.sprite.Sprite):
 
-    def __init__(self, name, level, x, y, moves=random.sample(list(all_moves.keys()), 4)):
+    def __init__(self, name, level, x, y, moves=random.sample(list(all_moves.keys()), 3)):
 
         pygame.sprite.Sprite.__init__(self)
 
@@ -219,6 +219,7 @@ class Character(pygame.sprite.Sprite):
             pygame.draw.rect(game, black, (self.hp_x + 70, self.hp_y + 26, 75, 5), 1)
 
     def use_medkit(self, tumblr=2):  # функция лечения
+        heal_sound.play()
         if tumblr == 2:
             self.current_hp += 30
             if self.current_hp > self.max_hp:
@@ -243,8 +244,8 @@ class Character(pygame.sprite.Sprite):
             if self.current_hp < 0:
                 self.current_hp = 0
 
-    def perform_attack(self, player, other, move):  # выполнение движения
-        if move.accuracy + (player.attack + player.speed) / (other.defense + other.speed) <= random.randint(1, 100):
+    def perform_attack(self, other, move):  # выполнение движения
+        if move.accuracy + (self.attack + self.speed) / (other.defense + other.speed) <= random.randint(1, 100):
             display_message(f'{self.name} used {move.name}')
             sounds[move.name].play()
             pygame.time.wait(2000)
@@ -267,10 +268,42 @@ class Character(pygame.sprite.Sprite):
         damage = math.floor(damage)
         display_message(f'{self.name} used {move.name}')
         sounds[move.name].play()
-        pygame.time.wait(2000)
+        alpha = 255
+        while alpha < 255:
+            game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+            transparency = (255, 255, 255, alpha)
+            other.draw()
+            other.draw_hp()
+            self.draw()
+            self.draw_hp()
+            sprite = damage_image.copy()
+            sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+            game.blit(sprite, (other.x+50, other.y+50))
+            display_message(f'{self.name} used {move.name}')
+            alpha += 2
+            pygame.display.update()
+        alpha = 255
+        while alpha > 2:
+            game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+            transparency = (255, 255, 255, alpha)
+            other.draw()
+            other.draw_hp()
+            self.draw()
+            self.draw_hp()
+            sprite = damage_image.copy()
+            sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+            game.blit(sprite, (other.x+50, other.y+50))
+            display_message(f'{self.name} used {move.name}')
+            alpha -= 2
+            pygame.display.update()
         display_message(f"{other.name} take {damage} {move.category} damage")
-        pygame.time.wait(2000)
         other.take_damage(damage)
+        pygame.time.wait(2000)
+        game.blit(bg_images["pre battle"+type_of_map], (0, 0))
+        other.draw()
+        self.draw()
+        self.draw_hp()
+        other.draw_hp()
         self.all_damage += damage
         self.favorite_weapon[move.name] += 1
 
@@ -316,6 +349,9 @@ pygame.display.set_icon(pygame_icon)
 pygame.display.set_caption('Halomon')
 bg_images = {}
 maps = {}
+damage_image = pygame.image.load(os.getcwd() + "\\damage.png").convert_alpha()
+damage_image = pygame.transform.scale(damage_image, (150, 150))
+
 for i in os.listdir(os.getcwd() + "\\backgrounds"):  # преобразование всх задников
     bg_img = pygame.image.load(os.getcwd() + "\\backgrounds\\" + i).convert_alpha()
     bg_img = pygame.transform.scale(bg_img, (game_width, game_height))
@@ -328,9 +364,14 @@ for i in os.listdir(os.getcwd() + "\\characters"):  # преобразовани
     ch_img = pygame.transform.scale(ch_img, (250, 250))
     ch_images[i[:i.find(".")]] = ch_img
 sounds = {}
-for i in os.listdir(os.getcwd() + "\\weapons sound"):  # преобразование всх задников
+for i in os.listdir(os.getcwd() + "\\weapons sound"):
     sound = pygame.mixer.Sound(os.getcwd() + "\\weapons sound\\" + i)
     sounds[i[:i.find(".")]] = sound
+openning = {}
+for i in os.listdir(os.getcwd() + "\\introduction sound"):
+    op = pygame.mixer.Sound(os.getcwd() + "\\introduction sound\\" + i)
+    openning[i[:i.find(".")]] = op
+heal_sound = pygame.mixer.Sound(os.getcwd() + "\\potion.mp3")
 
 game_status = "start_menu"
 maps[game_status].set_map()
@@ -378,7 +419,54 @@ while game_status != 'quit':
             elif game_status == 'player turn':  # выбор действие или медицина
 
                 if fight_button.collidepoint(mouse_click):
-                    game_status = 'player move_attack'
+                    total_pp = 0
+                    for i in player.moves:
+                        if i != "Return":
+                            total_pp += i.cur_pp
+                    if total_pp > 0:
+                        game_status = 'player move_attack'
+                    else:
+                        sounds["melee"].play()
+                        alpha = 0
+                        while alpha < 255:
+                            game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+                            transparency = (255, 255, 255, alpha)
+                            opponent.draw()
+                            opponent.draw_hp()
+                            player.draw()
+                            player.draw_hp()
+                            sprite = damage_image.copy()
+                            sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+                            game.blit(sprite, (opponent.x + 50, opponent.y + 50))
+                            display_message("Your hand go hard")
+                            alpha += 3
+                            pygame.display.update()
+                        alpha = 255
+                        while alpha > 2:
+                            game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+                            transparency = (255, 255, 255, alpha)
+                            opponent.draw()
+                            opponent.draw_hp()
+                            player.draw()
+                            player.draw_hp()
+                            sprite = damage_image.copy()
+                            sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+                            game.blit(sprite, (opponent.x + 50, opponent.y + 50))
+                            display_message("Your hand go hard")
+                            alpha -= 3
+                            pygame.display.update()
+                        opponent.current_shield = 0
+                        damage = int((2 * player.level + 10) / 250 * player.current_attack / opponent.current_defense * 70)
+                        player.all_damage += damage
+                        opponent.current_hp -= damage
+                        if opponent.current_hp <= 0:
+                            opponent.current_hp = 0
+                            game_status = 'fainted'
+                            opponent.draw_hp()
+                        else:
+                            game_status = 'opponent turn'
+                            opponent.draw_hp()
+                        pygame.display.update()
 
                 if potion_button.collidepoint(mouse_click):
                     game_status = 'player move_poition'
@@ -404,15 +492,18 @@ while game_status != 'quit':
                 elif quit_button.collidepoint(mouse_click):
                     game_status = "quit"
 
-            elif game_status == "end of game":  # обработка кнопки в меню
+            elif game_status == "end of game":
+                # обработка кнопки в меню
                 if main_menu_button.collidepoint(mouse_click):
                     game_status = 'start_menu'
                     maps[game_status].set()
                     font = pygame.font.Font(pygame.font.get_default_font(), 40)
                     title = font.render('Halomon', True, white)
                     game.blit(title, (250 - title.get_width() // 2, 150))
+
                 elif quit_from_game_button.collidepoint(mouse_click):
                     game_status = "quit"
+
                 elif results_button.collidepoint(mouse_click):
                     game_status = "results"
                     game.blit(bg_images["start_menu"], (0, 0))
@@ -441,34 +532,23 @@ while game_status != 'quit':
                     game_status = "quit"
 
             elif game_status == 'player move_attack':  # выбор действия
-                print(player.moves)
-                total_pp = 0
-                for i in player.moves:
-                    if i != "Return":
-                        total_pp += i.cur_pp
-                print(total_pp)
-                if total_pp > 0:
-                    for i in range(len(move_buttons)):
-                        button = move_buttons[i]
-                        if button.collidepoint(mouse_click) and i != 3:
-                            move = player.moves[i]
-                            if move.cur_pp == 0:
-                                display_message("Ammo is out")
-                                pygame.time.wait(2000)
-                                game_status = "player turn"
+                for i in range(len(move_buttons)):
+                    button = move_buttons[i]
+                    if button.collidepoint(mouse_click) and i != 3:
+                        move = player.moves[i]
+                        if move.cur_pp == 0:
+                            display_message("Ammo is out")
+                            pygame.time.wait(2000)
+                            game_status = "player turn"
+                        else:
+                            player.perform_attack(opponent, move)
+                            move.cur_pp -= 1
+                            if opponent.current_hp == 0:
+                                game_status = 'fainted'
                             else:
-                                player.perform_attack(player, opponent, move)
-                                move.cur_pp -= 1
-                else:
-                    display_message("Yout hand go hard")
-                    pygame.time.wait(2000)
-                    opponent.current_hp -= int((2 * player.level + 10) / 250 * player.current_attack / opponent.current_defense * 70)
-                if opponent.current_hp == 0:
-                    game_status = 'fainted'
-                else:
-                    game_status = 'opponent turn'
-            elif button.collidepoint(mouse_click) and i == 3:
-                game_status = "player turn"
+                                game_status = 'opponent turn'
+                    elif button.collidepoint(mouse_click) and i == 3:
+                        game_status = "player turn"
                 opponent.draw_hp()
                 player.draw_hp()
 
@@ -492,14 +572,19 @@ while game_status != 'quit':
                         game_status = "player turn"
                         pygame.time.wait(2000)
                     elif button.collidepoint(mouse_click) and i != 3:
-                        if opponent.current_shield != opponent.max_shield:  # восстановление щита противника
-                            opponent.current_shield = opponent.max_shield
-                        display_message(f'{player.name} used potion of {potion_buttons_name[i]}')
-                        player.use_medkit(i)
-                        game_status = 'opponent turn'
-                        opponent.draw_hp()
-                        player.draw_hp()
-                        pygame.time.wait(2000)
+                        if button.collidepoint(mouse_click) and i==2 and player.current_hp == player.max_hp:
+                            display_message("Health is maximum")
+                            pygame.time.wait(2000)
+                            game_status = "player turn"
+                        else:
+                            if opponent.current_shield != opponent.max_shield:  # восстановление щита противника
+                                opponent.current_shield = opponent.max_shield
+                            display_message(f'{player.name} used potion of {potion_buttons_name[i]}')
+                            player.use_medkit(i)
+                            game_status = 'opponent turn'
+                            opponent.draw_hp()
+                            player.draw_hp()
+                            pygame.time.wait(2000)
                     elif button.collidepoint(mouse_click) and i == 3:
                         game_status = "player turn"
 
@@ -523,6 +608,9 @@ while game_status != 'quit':
         opponent.hp_x = 50
         opponent.hp_y = 30
         alpha = 0
+        for i in openning.keys():
+            if i in opponent.name:
+                openning[i].play()
         while alpha < 255:
             game.blit(bg_images[game_status + type_of_map], (0, 0))
             opponent.draw(alpha=alpha)
@@ -530,6 +618,9 @@ while game_status != 'quit':
             alpha += 1
             pygame.display.update()
         alpha = 0
+        for i in openning.keys():
+            if i in player.name:
+                openning[i].play()
         while alpha < 255:
             game.blit(bg_images[game_status + type_of_map], (0, 0))
             opponent.draw()
@@ -609,47 +700,83 @@ while game_status != 'quit':
         display_message('...')
         pygame.time.wait(2000)
         move = random.choice(opponent.moves)
-        total_pp = 0
-        for i in opponent.moves:
-            if i != 1:
-                total_pp += i.cur_pp
-        if total_pp > 0:
-            while move != 1 and move.cur_pp == 0:
-                move = random.choice(opponent.moves)
-            if move == 1 and opponent.medkit > 0:
-                opponent.use_medkit()
-                opponent.draw_hp()
-                display_message(f"{opponent.name} used medkit")
-                if opponent.medkit == 0:
-                    opponent.moves.pop(-1)
-                if player.max_shield > 0:
-                    player.current_shield = player.max_shield
-                pygame.time.wait(2000)
-            else:
-                opponent.perform_attack(player, opponent, move)
-                move.cur_pp -= 1
-        else:
-            display_message("Yout hand go hard")
+        if move == 1 and opponent.medkit > 0 and opponent.current_hp != opponent.max_hp:
+            opponent.use_medkit()
+            display_message(f"{opponent.name} used medkit")
+            if opponent.medkit == 0:
+                opponent.moves.pop(-1)
+            if player.max_shield > 0:
+                player.current_shield = player.max_shield
             pygame.time.wait(2000)
-            opponent.current_hp -= (2 * opponent.level + 10) / 250 * opponent.current_attack / player.current_defense * 100
-        if player.current_hp == 0:
+        else:
+            total_pp = 0
+            if 1 in opponent.moves:
+                opponent.moves.pop(opponent.moves.index(1))
+            move = random.choice(opponent.moves)
+            for i in opponent.moves:
+                total_pp += i.cur_pp
+            print(opponent.moves)
+            if total_pp > 0:
+                while move.cur_pp == 0:
+                    move = random.choice(opponent.moves)
+                    print(move)
+                opponent.moves.append(1)
+                opponent.perform_attack(player, move)
+                move.cur_pp -= 1
+            else:
+                sounds["melee"].play()
+                alpha = 0
+                while alpha < 255:
+                    game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+                    transparency = (255, 255, 255, alpha)
+                    player.draw()
+                    player.draw_hp()
+                    opponent.draw()
+                    opponent.draw_hp()
+                    sprite = damage_image.copy()
+                    sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+                    game.blit(sprite, (player.x + 50, player.y + 50))
+                    display_message("His hand go hard")
+                    alpha += 3
+                    pygame.display.update()
+                alpha = 255
+                while alpha > 2:
+                    game.blit(bg_images["pre battle" + type_of_map], (0, 0))
+                    transparency = (255, 255, 255, alpha)
+                    player.draw()
+                    player.draw_hp()
+                    opponent.draw()
+                    opponent.draw_hp()
+                    sprite = damage_image.copy()
+                    sprite.fill(transparency, None, pygame.BLEND_RGBA_MULT)
+                    game.blit(sprite, (player.x + 50, player.y + 50))
+                    display_message("His hand go hard")
+                    alpha -= 3
+                    pygame.display.update()
+                player.current_shield = 0
+                player.current_hp -= int(
+                    (2 * opponent.level + 10) / 250 * opponent.current_attack / player.current_defense * 70)
+        if player.current_hp <= 0:
+            player.current_hp = 0
             game_status = 'fainted'
         else:
             game_status = 'player turn'
         player.draw_hp()
+        opponent.draw_hp()
+        pygame.display.update()
 
     if game_status == 'fainted':
         alpha = 255
         while alpha > 0:
             game.blit(bg_images["pre battle" + type_of_map], (0, 0))
-            if opponent.current_hp == 0:
+            if opponent.current_hp <= 0:
                 player.draw()
                 opponent.draw(alpha=alpha)
                 display_message(f'{opponent.name} fainted!')
             else:
-                display_message(f'{player.name} fainted!')
-                player.draw(alpha=alpha)
                 opponent.draw()
+                player.draw(alpha=alpha)
+                display_message(f'{player.name} fainted!')
             alpha -= 1
             pygame.display.update()
         if opponent.current_hp == 0:
@@ -677,6 +804,8 @@ while game_status != 'quit':
                 maps["evolution"].set_map()
                 alpha = 255
                 alpha1 = 0
+                player.x = 90
+                player.y = 90
                 while alpha > 0:
                     game.blit(bg_images["evolution"], (0, 0))
                     player.draw(alpha=alpha)
@@ -694,6 +823,7 @@ while game_status != 'quit':
                 player.set_sprite()
                 display_message(f"Now you are {player.name}!")
                 pygame.time.wait(3000)
+                player.x, player.y = 120, 90
 
             player.attack = math.floor(
                 0.01 * (2 * base_characters[player.name]["base_attack"] + player.IV_attack * player.level) + 5)

@@ -24,20 +24,56 @@
 		<ev_lvl>-1</ev_lvl>
 		<type>uncs</type>
 	</character>
-	<character name = "grunt">
-	    <hp>45</hp>
+	<character name = "grunt conscript">
+	    <hp>35</hp>
 		<attack>30</attack>
 		<defense>35</defense>
 		<speed>45</speed>
 		<sp_attack>20</sp_attack>
 		<sp_defense>20</sp_defense>
 		<shield>0</shield>
+		<evolution>grunt minor</evolution>
+		<ev_lvl>2</ev_lvl>
+		<type>covenant</type>
+	</character>
+	<character name = "grunt storm">
+	    <hp>45</hp>
+		<attack>40</attack>
+		<defense>45</defense>
+		<speed>55</speed>
+		<sp_attack>30</sp_attack>
+		<sp_defense>30</sp_defense>
+		<shield>0</shield>
+		<evolution>grunt major</evolution>
+		<ev_lvl>4</ev_lvl>
+		<type>covenant</type>
+	</character>
+	<character name = "grunt major">
+	    <hp>50</hp>
+		<attack>45</attack>
+		<defense>50</defense>
+		<speed>60</speed>
+		<sp_attack>35</sp_attack>
+		<sp_defense>35</sp_defense>
+		<shield>0</shield>
 		<evolution>no</evolution>
 		<ev_lvl>-1</ev_lvl>
 		<type>covenant</type>
 	</character>
+	<character name = "grunt minor">
+	    <hp>40</hp>
+		<attack>35</attack>
+		<defense>40</defense>
+		<speed>50</speed>
+		<sp_attack>25</sp_attack>
+		<sp_defense>25</sp_defense>
+		<shield>0</shield>
+		<evolution>grunt storm</evolution>
+		<ev_lvl>3</ev_lvl>
+		<type>covenant</type>
+	</character>
 	<character name = "sangheili minor">
-	    <hp>39</hp>
+	    <hp>45</hp>
 		<attack>52</attack>
 		<defense>43</defense>
 		<speed>65</speed>
